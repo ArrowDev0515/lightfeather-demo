@@ -1,4 +1,4 @@
-export const BACKEND_DOMAIN = "http://localhost:8083";
+export const BACKEND_DOMAIN = "http://localhost:8888";
 export const BE_API_URL_GET_SUPERVISOR_LIST = "/api/supervisors";
 export const BE_API_URL_CREATE_NOTIFICATION = "/api/submit";
 
