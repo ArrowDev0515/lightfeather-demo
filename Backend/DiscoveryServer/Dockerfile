@@ -1,4 +1,16 @@
-FROM java:8
-EXPOSE 8081
-ADD /target/discoveryserver-0.0.1-SNAPSHOT.jar discoveryserver.jar
-ENTRYPOINT ["java", "-jar", "discoveryserver.jar"]
+FROM openjdk:8-alpine
+
+RUN mkdir /usr/app
+COPY wait-for /usr/app
+
+WORKDIR /usr/app
+
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+
+RUN chmod +x wait-for
+
+RUN ./mvnw dependency:resolve
+
+COPY src ./src
+

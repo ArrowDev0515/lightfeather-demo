@@ -13,7 +13,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
-    command: ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=docker"]
+    environment:
+      - "DISCOVERY_SERVER_IP=config-service"
+      - "DISCOVERY_SERVER_PORT=${DISCOVERY_SERVER_PORT}"
+    command: ["./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
 
   discovery-service:
     container_name: discovery_service
@@ -41,7 +44,7 @@ services:
     command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run"]
     
   backend-database:
-    container_name: backend_database
+    container_name: backend-_database
     image: mysql:5.7
     ports:
       - "${BACKEND_DB_PORT}:${BACKEND_DB_PORT}"
