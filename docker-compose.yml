@@ -16,7 +16,7 @@ services:
     environment:
       - "DISCOVERY_SERVER_IP=config-service"
       - "DISCOVERY_SERVER_PORT=${DISCOVERY_SERVER_PORT}"
-    command: ["./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
+    command: ["./mvnw", "spring-boot:run"]
 
   discovery-service:
     container_name: discovery_service
