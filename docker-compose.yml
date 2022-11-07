@@ -1,0 +1,57 @@
+version: "2.12.1"
+
+volumes:
+  mysql_data:
+  mysql_config:
+    
+services:
+  config-service:
+    container_name: config_service
+    image: config-service:${VERSION}
+    build:
+      context: ./Backend/ConfigServer
+      dockerfile: Dockerfile
+    ports:
+      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    command: ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=docker"]
+
+  discovery-service:
+    container_name: discovery_service
+    image: discovery-service:${VERSION}
+    build:
+      context: ./Backend/DiscoveryServer
+      dockerfile: Dockerfile      
+    depends_on:
+      - "config-service"
+    ports:
+      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
+    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run"]
+
+  api-gateway:
+    container_name: api_gateway
+    image: api-gateway:${VERSION}
+    build:
+      context: ./Backend/ApiGateway
+      dockerfile: Dockerfile      
+    depends_on:
+      - "config-service"
+      - "discovery-service"
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run"]
+    
+  backend-database:
+    container_name: backend_database
+    image: mysql:5.7
+    ports:
+      - "${BACKEND_DB_PORT}:${BACKEND_DB_PORT}"
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+      - "mysql_config:/etc/mysql/conf.d"
+    environment:
+      - "MYSQL_ROOT_PASSWORD="
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=true"
+      - "MYSQL_USER=${BACKEND_DB_USER}"
+      - "MYSQL_PASSWORD=${BACKEND_DB_PASSWORD}"
+      - "MYSQL_DATABASE=${BACKEND_DB_DATABASE}"
+
