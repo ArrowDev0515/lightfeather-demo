@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin("http://localhost:3000")
 @RequestMapping(value = "/api")
 public class DemoController {
 
@@ -82,13 +82,13 @@ public class DemoController {
         return list;
     }
 
-    @RequestMapping(value = "/submit")
-    public void submit(@Valid @RequestBody NotificationModel item) {
+    @PostMapping(value = "/submit")
+    public org.springframework.http.ResponseEntity<String> submit(@RequestBody NotificationModel item) {
         demoService.createNotification(item);
         logger.info("A new Notification has created successfully.");
         logger.info("New Notification Info -> " + item.getFirstName() + ", " + item.getLastName() + ", " + item.getEmail()
                 + ", " + item.getPhoneNumber() + ", " + item.getSupervisor());
-//        return ResponseEntity.ok("Notification created successfully.");
+        return org.springframework.http.ResponseEntity.ok("Notification created successfully.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
