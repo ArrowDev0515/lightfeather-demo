@@ -1,8 +1,8 @@
 version: "2.12.1"
 
 volumes:
-  mysql_data:
   mysql_config:
+  mysql_data:
     
 services:
   config-service:
@@ -13,9 +13,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
-    environment:
-      - "DISCOVERY_SERVER_IP=config-service"
-      - "DISCOVERY_SERVER_PORT=${DISCOVERY_SERVER_PORT}"
+    depends_on:
+      backend-database:
+        condition: service_healthy
     command: ["./mvnw", "spring-boot:run"]
 
   discovery-service:
@@ -28,7 +28,7 @@ services:
       - "config-service"
     ports:
       - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
-    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run"]
+    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
 
   api-gateway:
     container_name: api_gateway
@@ -37,24 +37,41 @@ services:
       context: ./Backend/ApiGateway
       dockerfile: Dockerfile      
     depends_on:
-      - "config-service"
       - "discovery-service"
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
-    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run"]
+    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
     
   backend-database:
-    container_name: backend-_database
+    container_name: backend_database
     image: mysql:5.7
     ports:
       - "${BACKEND_DB_PORT}:${BACKEND_DB_PORT}"
     volumes:
-      - "mysql_data:/var/lib/mysql"
-      - "mysql_config:/etc/mysql/conf.d"
+      - mysql_data:/var/lib/mysql
+      - mysql_config:/etc/mysql/conf.d
+      - ./Backend/BackendDatabase/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - "MYSQL_ROOT_PASSWORD="
       - "MYSQL_ALLOW_EMPTY_PASSWORD=true"
       - "MYSQL_USER=${BACKEND_DB_USER}"
       - "MYSQL_PASSWORD=${BACKEND_DB_PASSWORD}"
       - "MYSQL_DATABASE=${BACKEND_DB_DATABASE}"
+    healthcheck:
+      test: "/usr/bin/mysql --user=${BACKEND_DB_USER} --password=${BACKEND_DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    
+  backend-service:
+    container_name: backend_service
+    image: backend-service:${VERSION}
+    build:
+      context: ./Backend/BackendService
+      dockerfile: Dockerfile      
+    depends_on:
+      - "discovery-service"
+    ports:
+      - "${BACKEND_SERVER_PORT}:${BACKEND_SERVER_PORT}"
+    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
 
