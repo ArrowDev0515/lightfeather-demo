@@ -18,7 +18,7 @@
 	
 	if start docker compose in background mode, you can use below command.
 	
-		docker compose --env-file .env -d up	
+		docker compose --env-file .env up -d
 
 
 	After few minutes, you can visit "http://localhost:3000".
