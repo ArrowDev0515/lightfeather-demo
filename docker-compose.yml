@@ -63,3 +63,15 @@ services:
       - "${BACKEND_SERVER_PORT}:${BACKEND_SERVER_PORT}"
     command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
 
+  frontend-service:
+    container_name: frontend_service
+    image: frontend-service:${VERSION}
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile      
+    depends_on:
+      - "api-gateway"
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    command: ["./wait-for", "api-gateway:${API_GATEWAY_PORT}", "-t 0", "--", "npm", "run", "dev"]
+
