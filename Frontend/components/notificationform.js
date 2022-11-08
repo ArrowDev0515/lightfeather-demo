@@ -53,7 +53,7 @@ export default function NotificationFormComponent() {
         }
     };
 
-    const validateEmail = (email) => /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
+    const validateEmail = (email) => /^[a-z.A-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
 
     const submit = async () => {
         let warningMsg = '';
