@@ -5,6 +5,19 @@ volumes:
   mysql_data:
     
 services:
+  config-service:
+    container_name: config_service
+    image: config-service:${VERSION}
+    build:
+      context: ./Backend/ConfigServer
+      dockerfile: Dockerfile      
+    depends_on:
+      backend-database:
+        condition: service_healthy
+    ports:
+      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    command: ["./mvnw", "spring-boot:run"]
+
   discovery-service:
     container_name: discovery_service
     image: discovery-service:${VERSION}
@@ -16,7 +29,7 @@ services:
         condition: service_healthy
     ports:
       - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
-    command: ["./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
+    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
 
   api-gateway:
     container_name: api_gateway
