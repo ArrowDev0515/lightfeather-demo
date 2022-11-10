@@ -37,6 +37,14 @@ spring:
             - Host=**
             - Method=GET,POST,OPTIONS
 
+  config:
+    import: optional:configserver:http://localhost:8888/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include=*:
 
 server:
   port: 8080

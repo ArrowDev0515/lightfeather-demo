@@ -10,8 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@Configuration
-@EnableWebMvc
 public class BackendServiceApplication implements WebMvcConfigurer {
 
 	public static void main(String[] args) {

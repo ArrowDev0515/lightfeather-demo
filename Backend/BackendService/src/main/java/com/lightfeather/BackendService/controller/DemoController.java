@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -36,6 +37,14 @@ public class DemoController {
 
     @Autowired
     NotificationServiceImpl demoService;
+
+    @Value("${backend.message:failed}")
+    String message;
+
+    @GetMapping(value="/test")
+    public String test() {
+        return message;
+    }
 
     @GetMapping(value = "/supervisors")
     public List getSupervisors() {
