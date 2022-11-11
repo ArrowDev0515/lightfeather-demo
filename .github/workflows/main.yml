@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Backend/ConfigServer
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/config-service:1.0
       -
@@ -34,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Backend/DiscoveryServer
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/discovery-service:1.0      
       -
@@ -42,7 +42,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Backend/ApiGateway
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/api-gateway:1.0      
       -
@@ -50,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Backend/BackendService
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/backend-service:1.0      
       -
@@ -58,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Frontend
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-service:1.0      
         
