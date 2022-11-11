@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./Backend/ConfigServer
-          file: ./Dockerfile
+          file: ./Backend/ConfigServer/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/config-service:1.0
       -
