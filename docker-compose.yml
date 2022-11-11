@@ -10,7 +10,8 @@ services:
     image: config-service:${VERSION}
     build:
       context: ./Backend/ConfigServer
-      dockerfile: Dockerfile      
+      dockerfile: Dockerfile
+      target: config_service
     depends_on:
       backend-database:
         condition: service_healthy
@@ -23,7 +24,8 @@ services:
     image: discovery-service:${VERSION}
     build:
       context: ./Backend/DiscoveryServer
-      dockerfile: Dockerfile      
+      dockerfile: Dockerfile
+      target: discovery_service
     depends_on:
       backend-database:
         condition: service_healthy
@@ -37,6 +39,7 @@ services:
     build:
       context: ./Backend/ApiGateway
       dockerfile: Dockerfile      
+      target: api_gateway
     depends_on:
       - "discovery-service"
     ports:
@@ -46,6 +49,8 @@ services:
   backend-database:
     container_name: backend_database
     image: mysql:5.7
+    build:
+      target: backend_database
     ports:
       - "${BACKEND_DB_PORT}:${BACKEND_DB_PORT}"
     volumes:
@@ -69,7 +74,8 @@ services:
     image: backend-service:${VERSION}
     build:
       context: ./Backend/BackendService
-      dockerfile: Dockerfile      
+      dockerfile: Dockerfile
+      target: backend_service
     depends_on:
       - "discovery-service"
     ports:
@@ -81,7 +87,8 @@ services:
     image: frontend-service:${VERSION}
     build:
       context: ./Frontend
-      dockerfile: Dockerfile      
+      dockerfile: Dockerfile
+      target: frontend_service
     depends_on:
       - "api-gateway"
     ports:
