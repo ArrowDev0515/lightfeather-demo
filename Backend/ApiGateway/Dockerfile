@@ -14,3 +14,7 @@ RUN ./mvnw dependency:resolve
 
 COPY src ./src
 
+RUN ./mvnw package -DskipTests
+
+RUN cp target/apigateway-*.jar /api-gateway.jar
+

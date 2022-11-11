@@ -16,7 +16,7 @@ services:
         condition: service_healthy
     ports:
       - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
-    command: ["./mvnw", "spring-boot:run"]
+    command: ["java", "-jar", "/config-service.jar"]
 
   discovery-service:
     container_name: discovery_service
@@ -29,7 +29,7 @@ services:
         condition: service_healthy
     ports:
       - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
-    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
+    command: ["./wait-for", "config-service:${CONFIG_SERVER_PORT}", "-t 0", "--", "java", "-Dspring.profiles.active=docker", "-jar", "/discovery-service.jar"]
 
   api-gateway:
     container_name: api_gateway
@@ -41,7 +41,7 @@ services:
       - "discovery-service"
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
-    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
+    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "java", "-Dspring.profiles.active=docker", "-jar", "/api-gateway.jar"]
     
   backend-database:
     container_name: backend_database
@@ -74,7 +74,7 @@ services:
       - "discovery-service"
     ports:
       - "${BACKEND_SERVER_PORT}:${BACKEND_SERVER_PORT}"
-    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "./mvnw", "spring-boot:run", "-Dspring-boot.run.arguments=--spring.profiles.active=docker"]
+    command: ["./wait-for", "discovery-service:${DISCOVERY_SERVER_PORT}", "-t 0", "--", "java", "-Dspring.profiles.active=docker", "-jar", "/backend-service.jar"]
 
   frontend-service:
     container_name: frontend_service
