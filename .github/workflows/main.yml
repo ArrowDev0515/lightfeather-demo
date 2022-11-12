@@ -12,6 +12,53 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
-      - 
-        name: Build the stack
-        run: docker-compose up --env-file .env -d
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build and push for config service
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Backend/ConfigServer
+          file: ./Backend/ConfigServer/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/config-service:1.0
+      -
+        name: Build and push for discovery service
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Backend/DiscoveryServer
+          file: ./Backend/DiscoveryServer/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/discovery-service:1.0      
+      -
+        name: Build and push for api gateway
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Backend/ApiGateway
+          file: ./Backend/ApiGateway/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/api-gateway:1.0      
+      -
+        name: Build and push for backend service
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Backend/BackendService
+          file: ./Backend/BackendService/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/backend-service:1.0      
+      -
+        name: Build and push for frontend service
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Frontend
+          file: ./Frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-service:1.0      
+        
